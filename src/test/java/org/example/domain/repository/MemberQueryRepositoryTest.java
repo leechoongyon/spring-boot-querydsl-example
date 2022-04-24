@@ -21,17 +21,30 @@ public class MemberQueryRepositoryTest {
     @Autowired
     private MemberQueryRepository memberQueryRepository;
 
-    @Before
-    public void setUp() {
+    @Test
+    public void member_querydsl_테스트 () throws Exception {
         Member member = Member.builder()
                 .name("test")
                 .build();
         memberRepository.save(member);
+
+        List<Member> list = memberQueryRepository.findByName("test");
+        Assert.assertEquals(1, list.size());
     }
 
     @Test
-    public void member_querydsl_테스트 () throws Exception {
-        List<Member> list = memberQueryRepository.findByName("test");
-        Assert.assertEquals(1, list.size());
+    public void from_서브쿼리_테스트() throws Exception {
+        Member member = Member.builder()
+                .name("test")
+                .build();
+        memberRepository.save(member);
+
+        Member member2 = Member.builder()
+                .name("test2")
+                .build();
+        memberRepository.save(member2);
+
+        Member result = memberQueryRepository.findOneOrderByName();
+        Assert.assertEquals("test", result.getName());
     }
 }
