@@ -20,8 +20,16 @@ public class Member extends BaseTime {
     @Column
     private String name;
 
+    @Column
+    private String telNo;
+
+    @Column
+    private int age;
+
     @Builder
-    public Member(String name) {
+    public Member(String name, String telNo, int age) {
         this.name = name;
+        this.telNo = telNo;
+        this.age = age;
     }
 }

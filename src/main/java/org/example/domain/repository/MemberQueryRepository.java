@@ -1,10 +1,13 @@
 package org.example.domain.repository;
 
 
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.example.domain.entity.Member;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -49,5 +52,36 @@ public class MemberQueryRepository {
             throw new IllegalStateException("list is null");
         }
         return list.get(0);
+    }
+
+    public List<Member> findMemberByDynamicCondition(String name, String telNo, int age) {
+        return jpaQueryFactory.
+                selectFrom(member)
+                .where(eqTelNo(telNo),
+                        eqAge(age),
+                        eqName(name)
+                )
+                .fetch();
+    }
+
+    private BooleanExpression eqName(String name) {
+        if (StringUtils.hasText(name)) {
+            return member.name.eq(name);
+        }
+        return null;
+    }
+
+    private BooleanExpression eqAge(int age) {
+        if (age > 0) {
+            return member.age.eq(age);
+        }
+        return null;
+    }
+
+    private BooleanExpression eqTelNo(String telNo) {
+        if (StringUtils.hasText(telNo)) {
+            return member.telNo.eq(telNo);
+        }
+        return null;
     }
 }

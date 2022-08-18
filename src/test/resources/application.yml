@@ -26,3 +26,8 @@ spring:
     jpa:
       repositories:
         bootstrap-mode: default
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace

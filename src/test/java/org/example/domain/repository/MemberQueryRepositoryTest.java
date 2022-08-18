@@ -1,17 +1,16 @@
 package org.example.domain.repository;
 
 import org.example.domain.entity.Member;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
+// querydsl 테스트 할려면 SpringBootTest 이용해야 함.
 @SpringBootTest
 public class MemberQueryRepositoryTest {
 
@@ -21,6 +20,16 @@ public class MemberQueryRepositoryTest {
     @Autowired
     private MemberQueryRepository memberQueryRepository;
 
+    @BeforeEach
+    public void setUp() {
+
+    }
+
+    @AfterEach
+    public void release() {
+        memberRepository.deleteAll();
+    }
+
     @Test
     public void member_querydsl_테스트 () throws Exception {
         Member member = Member.builder()
@@ -29,7 +38,7 @@ public class MemberQueryRepositoryTest {
         memberRepository.save(member);
 
         List<Member> list = memberQueryRepository.findByName("test");
-        Assert.assertEquals(1, list.size());
+        Assertions.assertEquals(1, list.size());
     }
 
     @Test
@@ -45,6 +54,27 @@ public class MemberQueryRepositoryTest {
         memberRepository.save(member2);
 
         Member result = memberQueryRepository.findOneOrderByName();
-        Assert.assertEquals("test", result.getName());
+        Assertions.assertEquals("test", result.getName());
+    }
+
+    @Test
+    @DisplayName("where_다이나믹_쿼리_테스트")
+    public void where_다이나믹_쿼리_테스트 () throws Exception {
+        // given
+        Member member = Member.builder()
+                .name("test")
+                .telNo("123123123")
+                .age(15)
+                .build();
+        memberRepository.save(member);
+
+
+        // when
+        List<Member> list = memberQueryRepository.
+                findMemberByDynamicCondition("test", "123123123", 15);
+
+        // then
+        Assertions.assertEquals(15, list.get(0).getAge());
+
     }
 }
